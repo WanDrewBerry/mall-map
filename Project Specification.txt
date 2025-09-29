@@ -1,0 +1,273 @@
+Project Title: Mall Map Website
+Design Requirements:
+List of malls from a database, displaying:
+
+Mall Image.
+
+Mall Name.
+
+Mall Description.
+
+Interactive Map with:
+
+Location pins for all malls.
+
+Zoom-in and zoom-out functionality.
+
+Navigation bar with these links:
+
+HOME.
+
+List of Malls.
+
+Log In.
+
+Log Out.
+
+Register.
+
+Detailed Mall Information Page:
+
+Mall Name.
+
+Address.
+
+History.
+
+Reviews Section.
+
+Add a review box.
+
+Responsive design for mobile, tablet, and desktop use.
+
+Functional Requirements:
+CRUD Operations for Malls:
+
+Users or admins can create, read, update, and delete mall details.
+
+Image Uploads:
+
+Mall images are uploaded from local folders.
+
+Authentication System:
+
+User registration, log in, and log out functionality.
+
+Reviews:
+
+Users can add, edit, and delete their own reviews. 
+
+Admin can add, edit, and delete all the reviews.
+
+Security Features:
+
+Handle client data and sessions securely.
+
+Encrypt passwords using tools like bcrypt.
+
+Use JWT (JSON Web Tokens) for authentication.
+
+Unique IDs:
+
+Assign a unique identifier to each mall.
+
+Additional Enhancements:
+Search and Filter:
+
+Users can search for malls by name and filter by location, size, or type.
+
+User Roles:
+
+Differentiate between admin (full access) and regular users (limited access).
+
+Star-Based Rating System:
+
+Add a feature to rate malls alongside reviews.
+
+Favorites:
+
+Users can save malls to a "Favorites" list.
+
+Email Verification & Password Recovery:
+
+Verify email during registration and add a "Forgot Password" feature.
+
+Admin Dashboard:
+
+Show statistics like the total number of malls, reviews, or highest-rated malls.
+
+Notifications:
+
+Notify users when their review is liked or when a favorite mall is updated.
+
+Deployment:
+
+Deploy the app to platforms like Vercel for the frontend and Heroku for the backend.
+
+Tools and Technologies:
+Frontend: React.js..
+
+Backend: Node.js + Express.js..
+
+Database: MongoDB.
+
+Map API: Google Maps API or Leaflet.js..
+
+Image Upload: Multer (Node.js library).
+
+Security: bcrypt (password encryption) and JWT (authentication).
+
+*******************___________________***********************
+
+Phased Development Plan:
+Phase 1: Initial Setup - Done
+Set up project structure for frontend (React) and backend (Node.js + Express).
+
+Create MongoDB database for malls and user data.
+
+Implement basic CRUD operations for malls.
+
+Set up user authentication (registration, login, logout).
+
+Create basic pages: Home, List of Malls, and Mall Details.
+
+Phase 2: Core Features
+Add map integration with location pins and zoom controls.
+
+Allow users to add, edit, and delete reviews.- Done
+
+Implement secure sessions and unique IDs for malls.
+
+Upload and display images using Multer.
+
+Phase 3: Enhancements
+Add search and filter functionality.
+
+Implement responsive design for various devices.
+
+Introduce user roles (admin and regular users).
+
+Add rating system and favorites feature.
+
+Phase 4: Final Touches
+Include email verification and password recovery.
+
+Create an admin dashboard with analytics.
+
+Thoroughly test for security, performance, and user experience.
+
+Deploy the application to hosting platforms.
+
+
+*****************________________***********************
+
+Essential NPM Packages:
+1. Backend (Node.js + Express)
+Core Packages:
+
+express: To create the server and handle routing.
+
+mongoose: To connect to MongoDB and handle database interactions.
+
+dotenv: For managing environment variables (e.g., database URI, secret keys).
+
+Middleware:
+
+body-parser: For parsing incoming JSON request bodies (nowadays handled natively in Express, but still useful for older compatibility).
+
+cors: To handle Cross-Origin Resource Sharing between frontend (React) and backend.
+
+helmet: To enhance app security by setting various HTTP headers.
+
+morgan: For logging HTTP requests during development.
+
+Authentication & Security:
+
+bcrypt: For hashing passwords securely.
+
+jsonwebtoken (JWT): For user authentication and managing sessions.
+
+File Handling:
+
+multer: For handling file uploads (e.g., mall images).
+
+2. Frontend (React)
+React Core:
+
+react: For creating the frontend UI.
+
+react-dom: To render the React components to the DOM.
+
+React Router:
+
+react-router-dom: For managing navigation and routes in your React app.
+
+HTTP Requests:
+
+axios: For making API calls to your backend.
+
+State Management (if needed):
+
+redux and react-redux: For managing app-wide state.
+
+Map Libraries:
+
+react-leaflet or @react-google-maps/api: For integrating interactive maps with pins.
+
+Styling:
+
+bootstrap or tailwindcss: For responsive and stylish designs.
+
+Alternatively, use styled-components for CSS-in-JS styling.
+
+*****************________________***********************
+
+Important Routes (Examples):
+1. Mall Routes
+GET /api/malls: Fetch all malls.
+
+GET /api/malls/:id: Fetch details of a specific mall.
+
+POST /api/malls: Create a new mall (admin only).
+
+PUT /api/malls/:id: Update mall information (admin only).
+
+DELETE /api/malls/:id: Delete a mall (admin only).
+
+2. User Routes
+POST /api/auth/register: Register a new user.
+
+POST /api/auth/login: Authenticate and log in a user.
+
+POST /api/auth/logout: Log out a user.
+
+3. Review Routes
+POST /api/malls/:id/reviews: Add a review to a mall.
+
+PUT /api/reviews/:id: Edit a user’s review.
+
+DELETE /api/reviews/:id: Delete a user’s review.
+
+*****************________________***********************
+
+Final Checklist
+
+
+NPM Packages:
+
+Backend: express, mongoose, cors, helmet, bcrypt, jsonwebtoken, multer, etc.
+
+Frontend: react, react-dom, axios, react-router-dom, react-leaflet or @react-google-maps/api, etc.
+
+File Structure:
+
+Organized directories for both frontend and backend.
+
+Routes:
+
+CRUD operations, user authentication, and review management.
+
+Middlewares:
+
+Authentication, error handling, and file uploading.
+

@@ -1,0 +1,83 @@
+Backend Structure Overview
+The Backend is responsible for handling requests, managing authentication, interacting with the database, and serving data to the frontend. Here’s how the key files work together:
+1️⃣ Models (models/)
+- User.js → Defines the user schema (username, email, password, role).
+- Mall.js → Represents malls in the database (name, location, stores, reviews).
+- Review.js (done inside Mall.js) → Stores user reviews for malls.
+📌 Why It’s Important?
+These files define the database structure and ensure data consistency.
+
+2️⃣ Controllers (controllers/)
+- userController.js → Handles user registration, login, logout, and authentication.
+- mallController.js → Manages mall-related operations (fetching mall details, adding malls).
+- reviewController.js (Done inside MallController) → Handles user reviews (posting, updating, deleting).
+📌 Why It’s Important?
+Controllers process requests and interact with models to fetch or modify data.
+
+3️⃣ Routes (routes/)
+- userRoutes.js → Defines API endpoints for user authentication (/register, /login, /logout).
+- mallRoutes.js → Handles mall-related API requests (/malls, /mall/:id).
+- reviewRoutes.js → Manages review-related API requests (/reviews, /review/:id).
+📌 Why It’s Important?
+Routes connect frontend requests to backend logic.
+
+4️⃣ Middleware (middleware/)
+- authMiddleware.js → Verifies JWT tokens for protected routes.
+- errorHandler.js → Handles errors gracefully.
+📌 Why It’s Important?
+Middleware adds security and error handling to your backend.
+
+5️⃣ Utilities (utils/)
+- AuthService.js → Manages authentication logic (token validation, session handling).
+- blocklist.js → Stores invalidated tokens to prevent unauthorized access.
+📌 Why It’s Important?
+Utilities help with authentication and security.
+
+6️⃣ Configuration (config/)
+- database.js → Connects to MongoDB.
+- server.js → Sets up the Express server.
+📌 Why It’s Important?
+Configuration files initialize the backend and database.
+
+🔹 Frontend Structure Overview
+The frontend is built with React, handling UI, user interactions, and API calls to the backend.
+1️⃣ Components (components/)
+- Navbar.tsx → Displays navigation links.
+- MallMap.tsx → Shows a map of malls.
+- ReviewForm.tsx → Allows users to submit reviews.
+- ImageUploader.tsx → Handles image uploads.
+📌 Why It’s Important?
+Components build the UI and improve user experience.
+
+2️⃣ Pages (pages/)
+- LandingPage.tsx → The homepage users see first.
+- Login.tsx → Handles user authentication.
+- Register.tsx → Allows new users to sign up.
+- MallDetails.tsx → Displays mall information.
+📌 Why It’s Important?
+Pages structure the app and define navigation.
+
+3️⃣ Context (context/)
+- SessionHandler.tsx → Manages user session state.
+📌 Why It’s Important?
+Context stores global state for authentication.
+
+4️⃣ API (api/)
+- MallAPI.ts → Fetches mall data from the backend.
+- AuthAPI.ts → Handles login and registration requests.
+📌 Why It’s Important?
+API files connect the frontend to the backend.
+
+5️⃣ Utilities (utils/)
+- AuthService.ts → Manages authentication logic.
+📌 Why It’s Important?
+Utilities help with authentication and session management.
+
+🔹 How Backend & Frontend Work Together
+- Frontend sends requests (e.g., login, fetch malls) via API files.
+- Backend processes requests using controllers and models.
+- Database stores/retrieves data and sends responses back.
+- Frontend updates UI based on the received data.
+
+🔹 Final Thoughts
+The project is well-structured, making it easier to maintain and scale. Understanding these relationships will help me build future projects efficiently. 🚀

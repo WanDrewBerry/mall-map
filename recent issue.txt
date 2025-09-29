@@ -1,0 +1,18 @@
+Here’s a quick summary of what we’re working on:
+✅ Fixing the delete button for images in MallDetails.tsx
+- Moved the ❌ button to each image in the upper section.
+- Ensured it only appears for admins.
+- Made sure deleted images are properly removed from state (setMall).
+✅ Restoring missing photos & reviews
+- Mapped data.images correctly to photos.
+- Ensured reviews aren't accidentally overwritten in state.
+✅ Cleaning up ImageUploader.tsx
+- Removed broken upload images section.
+- Kept only the necessary upload functionality.
+
+🔹 Next Steps
+1️⃣ Paste updated MallDetails.tsx → Refresh and check if images + reviews appear.
+2️⃣ Test the delete button as an admin → See if images are removed correctly.
+3️⃣ Let me know if everything works smoothly! 🚀🔥
+If you ever need to pick up where we left off, just refer to this summary! 💯
+Let me know how the tests go!

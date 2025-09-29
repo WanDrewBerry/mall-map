@@ -1,0 +1,265 @@
+const Mall = require('../models/Mall');
+const mongoose = require('mongoose');
+
+// Create Mall (Admin-only)
+const createMall = async (req, res) => {
+  try {
+    const newMall = new Mall(req.body);
+    const savedMall = await newMall.save();
+    res.status(201).json({ message: "Mall created successfully!", mall: savedMall });
+  } catch (err) {
+    console.error("Error creating mall:", err);
+    res.status(500).json({ message: "An error occurred while creating the mall.", error: err.message });
+  }
+};
+
+// Get All Malls with Pagination & Sorting (Public)
+const getMalls = async (req, res) => {
+  try {
+    let { page = 1, limit = 10, sortBy = 'createdAt', order = 'desc' } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    order = order === 'asc' ? 1 : -1;
+    const skip = (page - 1) * limit;
+
+    const totalMalls = await Mall.countDocuments();
+    const malls = await Mall.find()
+      .sort({ [sortBy]: order })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      page,
+      limit,
+      totalItems: totalMalls,
+      totalPages: Math.ceil(totalMalls / limit),
+      malls
+    });
+  } catch (err) {
+    console.error("Error fetching malls with pagination:", err);
+    res.status(500).json({ message: "An error occurred while retrieving malls.", error: err.message });
+  }
+};
+
+// Get Mall by ID (Public)
+const getMallById = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid mall ID" });
+  }
+  try {
+    const mall = await Mall.findById(id);
+    if (!mall) {
+      return res.status(404).json({ message: "Mall not found" });
+    }
+    res.status(200).json(mall);
+  } catch (err) {
+    console.error("Error retrieving mall by ID:", err.message);
+    res.status(500).json({ message: "An error occurred while retrieving the mall.", error: err.message });
+  }
+};
+
+// Update mall
+const updateMall = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid mall ID" });
+  }
+  try {
+    console.log("Update request body:", req.body);
+    const updatedMall = await Mall.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+    console.log("Updated mall:", updatedMall);
+    if (!updatedMall) {
+      console.warn("Mall not found for update:", id);
+      return res.status(404).json({ message: "Mall not found" });
+    }
+    res.status(200).json({ message: "Mall updated successfully!", updatedMall });
+  } catch (err) {
+    console.error("Error updating mall:", err);
+    res.status(500).json({ message: "An error occurred while updating the mall.", error: err.message });
+  }
+};
+
+// Delet Mall
+const deleteMall = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid mall ID" });
+  }
+  try {
+    const deletedMall = await Mall.findByIdAndDelete(id);
+    if (!deletedMall) {
+      return res.status(404).json({ message: "Mall not found" });
+    }
+    res.status(200).json({ message: "Mall deleted successfully!" });
+  } catch (err) {
+    console.error("Error deleting mall:", err);
+    res.status(500).json({ message: "An error occurred while deleting the mall.", error: err.message });
+  }
+};
+
+// Search Mall
+const searchMalls = async (req, res) => {
+  try {
+    const { name, description, city, minLat, maxLat, minLng, maxLng } = req.query;
+    let filter = {};
+
+    // Apply filters based on search parameters
+    if (name) filter.name = { $regex: name, $options: 'i' }; // Case-insensitive search
+    if (description) filter.description = { $regex: description, $options: 'i' }; // Partial match search
+    if (city) filter.address = { $regex: city, $options: 'i' }; // Match city in address
+
+    // Geolocation filtering
+    if (minLat && maxLat) {
+      filter['location.lat'] = { $gte: parseFloat(minLat), $lte: parseFloat(maxLat) };
+    }
+    if (minLng && maxLng) {
+      filter['location.lng'] = { $gte: parseFloat(minLng), $lte: parseFloat(maxLng) };
+    }
+
+    // Find malls that match the search criteria
+    const malls = await Mall.find(filter);
+    res.status(200).json(malls);
+  } catch (err) {
+    console.error("Error searching malls:", err.message);
+    res.status(500).json({ message: "An error occurred while searching for malls.", error: err.message });
+  }
+};
+
+// Get Detailed Mall Information (Public)
+const getMallDetails = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid mall ID" });
+  }
+  try {
+    const mall = await Mall.findById(id).populate('reviews'); // Populate reviews if there's a relation
+    if (!mall) {
+      return res.status(404).json({ message: "Mall not found" });
+    }
+    res.status(200).json(mall);
+  } catch (err) {
+    console.error("Error retrieving detailed mall info:", err.message);
+    res.status(500).json({ message: "An error occurred while retrieving detailed mall info.", error: err.message });
+  }
+};
+
+// Add review
+// Add review (Protected)
+const addReview = async (req, res) => {
+  const { id } = req.params; // Mall ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid mall ID" });
+  }
+
+  const { rating, comment } = req.body;
+  if (!rating) {
+    return res.status(400).json({ message: "Rating is required" });
+  }
+
+  try {
+    // Assumes that req.user is set by authentication middleware.
+    const review = {
+      user: req.user.id,
+      username: req.user.name,
+      rating,
+      comment,
+      createdAt: new Date()
+    };
+
+    const mall = await Mall.findById(id);
+    if (!mall) {
+      return res.status(404).json({ message: "Mall not found." });
+    }
+
+    mall.reviews.push(review); // Add review to mall's review array
+    await mall.save(); // Save changes
+
+    res.status(200).json({ message: "Review added successfully!", review, mall });
+  } catch (err) {
+    console.error("Error adding review:", err);
+    res.status(500).json({ message: "Internal server error while adding review." });
+  }
+};
+
+// Update Review (Protected)
+const editReview = async (req, res) => {
+  try {
+    const { mallId, reviewId } = req.params;
+    const { rating, comment } = req.body;
+
+    if (!rating || !comment) {
+      return res.status(400).json({ message: "Rating and comment are required." });
+    }
+
+    const mall = await Mall.findById(mallId);
+    if (!mall) {
+      return res.status(404).json({ message: "Mall not found." });
+    }
+
+    const review = mall.reviews.id(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found." });
+    }
+
+    if (review.user.toString() !== req.user.id && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Unauthorized to edit this review." });
+    }
+
+    review.rating = rating;
+    review.comment = comment; 
+    await mall.save();
+
+    res.status(200).json({ message: "Review updated successfully!", review });
+  } catch (err) {
+    console.error("Error editing review:", err.message);
+    res.status(500).json({ message: "Internal server error while editing review." });
+  }
+};
+
+// Delete Review (Protected)
+const deleteReview = async (req, res) => {
+  try {
+    const { mallId, reviewId } = req.params;
+
+    const mall = await Mall.findById(mallId);
+    if (!mall) {
+      return res.status(404).json({ message: "Mall not found." });
+    }
+
+    const review = mall.reviews.id(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found." });
+    }
+
+    if (review.user.toString() !== req.user.id && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Unauthorized to delete this review." });
+    }
+
+    mall.reviews.pull(reviewId);
+    await mall.save();
+
+    res.status(200).json({ message: "Review deleted successfully!" });
+  } catch (err) {
+    console.error("Error deleting review:", err.message);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+// Export all controllers
+module.exports = {
+  createMall,
+  getMalls,
+  getMallById,
+  getMallDetails, // Added missing function
+  updateMall,
+  deleteMall,
+  searchMalls,
+  addReview,
+  editReview, // Added missing function
+  deleteReview // Added missing function
+};

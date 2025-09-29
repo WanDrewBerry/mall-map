@@ -1,0 +1,45 @@
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+    
+    // Compare the provided password with the hashed one
+    const validPassword = await user.comparePassword(password);
+    if (!validPassword) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+    
+    // Set default name for admin if name is not provided
+    // This assumes that if registered as an admin, you might only have a username
+    const name = user.name || (user.role === 'admin' ? 'admin' : user.username);
+    console.log("Name being used for token:", name);
+    // Sign the token with the required fields: id, name, and role
+    const token = jwt.sign(
+      {
+        id: user._id,      // It will be available as req.user.id
+        name: name,        // It will be available as req.user.name
+        role: user.role    // It will be available as req.user.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    
+    res.status(200).json({
+      message: "Login successful!",
+      token: token
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error during login" });
+  }
+};
+
+module.exports = { loginUser };
