@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../utils/AuthService";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  // ✅ Redirect logged-in users
   useEffect(() => {
     if (AuthService.isAuthenticated()) {
       navigate("/mall-map");
@@ -38,6 +37,7 @@ const Login: React.FC = () => {
         localStorage.setItem("role", data.role || "user");
         AuthService.login(data.accessToken);
         window.dispatchEvent(new Event("storage"));
+        console.log("➡️ Redirecting to /mall-map...");
         navigate("/mall-map");
       } else {
         setErrorMessage(data.message || "❌ Incorrect credentials.");
@@ -57,14 +57,13 @@ const Login: React.FC = () => {
         <input type="email" name="email" placeholder="Email" onChange={handleChange} required style={inputStyle} />
         <input type="password" name="password" placeholder="Password" onChange={handleChange} required style={inputStyle} />
 
-        {/* ✅ Dynamic hover & click effects applied inside button */}
         <button
           type="submit"
           style={buttonStyle}
-          onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-          onMouseOut={(e) => e.currentTarget.style.transform = "scale(1.0)"}
-          onMouseDown={(e) => e.currentTarget.style.transform = "scale(0.95)"}
-          onMouseUp={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+          onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+          onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1.0)")}
+          onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.95)")}
+          onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
         >
           Login
         </button>
@@ -81,7 +80,7 @@ const containerStyle: React.CSSProperties = {
   justifyContent: "center",
   height: "100vh",
   background: "white",
-  animation: "fadeIn 1s ease-in-out", // ✅ Now Login page also fades in
+  animation: "fadeIn 1s ease-in-out",
 };
 
 const titleStyle = {
@@ -98,7 +97,7 @@ const errorStyle = {
 
 const formStyle: React.CSSProperties = {
   display: "flex",
-  flexDirection: "column", // ✅ Fixed type issue
+  flexDirection: "column",
   alignItems: "center",
   gap: "12px",
   padding: "20px",
