@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({ username: "", email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
@@ -15,7 +17,7 @@ const Register: React.FC = () => {
     setErrorMessage("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
