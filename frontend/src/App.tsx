@@ -38,14 +38,29 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <SessionHandler /> {/* ✅ Handles navigation inside Router */}
       <Navbar isLoggedIn={isLoggedIn} />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/mall-map" element={<MallMap />} />
-        <Route path="/mall/:id" element={<MallDetails />} />
+        <Route
+          path="/mall-map"
+          element={
+            <>
+              <SessionHandler />
+              <MallMap />
+            </>
+          }
+        />
+        <Route
+          path="/mall/:id"
+          element={
+            <>
+              <SessionHandler />
+              <MallDetails />
+            </>
+          }
+        />
       </Routes>
     </Router>
   );

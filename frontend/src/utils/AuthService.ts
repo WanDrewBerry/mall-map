@@ -1,6 +1,16 @@
 import { jwtDecode } from "jwt-decode";
 
-const AuthService = {
+interface AuthServiceType {
+  login: (token: string) => void;
+  logout: (navigate?: (path: string) => void) => void;
+  isAuthenticated: () => boolean;
+  checkSessionExpiration: (navigate?: (path: string) => void) => void;
+  getUser: () => { id: string; username: string; role: string } | null;
+  getIdentifier: () => string | null;
+  getToken: () => string | null; // ✅ Added to interface
+}
+
+const AuthService: AuthServiceType = {
   login: (token: string): void => {
     localStorage.setItem("accessToken", token);
 
@@ -9,7 +19,7 @@ const AuthService = {
       if (decoded.id) {
         localStorage.setItem("userId", decoded.id);
         localStorage.setItem("username", decoded.username || "Guest");
-        localStorage.setItem("role", decoded.role || "user"); // 🔥 Stores role
+        localStorage.setItem("role", decoded.role || "user");
         console.log("✅ Stored user:", decoded);
       } else {
         console.error("🚨 Error: No user ID found in decoded token!");
@@ -24,12 +34,12 @@ const AuthService = {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");
     localStorage.removeItem("username");
-    localStorage.removeItem("role"); // 🔥 Removes role on logout
+    localStorage.removeItem("role");
 
-    window.dispatchEvent(new Event("storage")); // ✅ Notify components of logout
-    
+    window.dispatchEvent(new Event("storage"));
+
     if (navigate) {
-      navigate("/"); // ✅ Uses React Router if provided
+      navigate("/");
     }
   },
 
@@ -63,7 +73,7 @@ const AuthService = {
 
       if (decoded.exp < currentTime) {
         console.log("🚨 Token expired, logging out...");
-        AuthService.logout(navigate); // ✅ Properly handle logout when session expires
+        AuthService.logout(navigate);
       }
     } catch (error) {
       console.error("❌ Token decoding failed:", error);
@@ -82,6 +92,15 @@ const AuthService = {
       return null;
     }
   },
+
+  getIdentifier: (): string | null => {
+    const user = AuthService.getUser();
+    return user?.id || null;
+  },
+
+  getToken: (): string | null => {
+    return localStorage.getItem("accessToken");
+  }
 };
 
 export default AuthService;
