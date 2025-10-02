@@ -10,9 +10,33 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (AuthService.isAuthenticated()) {
-      navigate("/mall-map");
-    }
+    console.log("🌐 API_BASE:", API_BASE); // ✅ Debug: confirm correct endpoint
+
+    const checkAuthStatus = async () => {
+      try {
+        const accessToken = AuthService.getToken();
+        const response = await fetch(`${API_BASE}/api/auth/status`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          credentials: "include",
+        });
+
+        const data = await response.json();
+        if (data.status === true) {
+          console.log("✅ Already authenticated:", data.user);
+          navigate("/mall-map");
+        } else {
+          console.log("🚫 Not authenticated:", data.message);
+        }
+      } catch (err) {
+        console.error("❌ Error checking auth status:", err);
+      }
+    };
+
+    checkAuthStatus();
   }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,15 +58,16 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       if (response.ok && data.accessToken) {
-        localStorage.setItem("role", data.role || "user");
         AuthService.login(data.accessToken);
         window.dispatchEvent(new Event("storage"));
         console.log("➡️ Redirecting to /mall-map...");
         navigate("/mall-map");
       } else {
+        console.warn("🚫 Login failed:", data);
         setErrorMessage(data.message || "❌ Incorrect credentials.");
       }
     } catch (err) {
+      console.error("❌ Login request error:", err);
       setErrorMessage("❌ Login failed. Please try again.");
     }
   };
@@ -50,13 +75,24 @@ const Login: React.FC = () => {
   return (
     <div style={containerStyle}>
       <h2 style={titleStyle}>Login</h2>
-
       {errorMessage && <p style={errorStyle}>{errorMessage}</p>}
-
       <form onSubmit={handleSubmit} style={formStyle}>
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} required style={inputStyle} />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} required style={inputStyle} />
-
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+          required
+          style={inputStyle}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          required
+          style={inputStyle}
+        />
         <button
           type="submit"
           style={buttonStyle}
@@ -72,7 +108,7 @@ const Login: React.FC = () => {
   );
 };
 
-/* ✅ Professional Styling */
+// ✅ Styling remains unchanged
 const containerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
